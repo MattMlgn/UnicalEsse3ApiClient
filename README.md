@@ -34,3 +34,17 @@ password = 'your_password'
 # Licenza
 
 Questo progetto è concesso in licenza sotto la Creative Commons Attribution-NoDerivs (CC BY-ND). Per maggiori dettagli, visita [Creative Commons BY-ND](https://creativecommons.org/licenses/by-nd/4.0/).
+
+## Sei libero di:
+
+- **Condividere** — copiare e redistribuire il materiale in qualsiasi mezzo o formato per qualsiasi scopo, anche commerciale.
+
+Il licenziante non può revocare queste libertà fintanto che segui i termini della licenza.
+
+## Sotto i seguenti termini:
+
+- **Attribuzione** — Devi dare il credito appropriato, fornire un link alla licenza, e indicare se sono state apportate modifiche. Puoi farlo in qualsiasi modo ragionevole, ma non in alcun modo che suggerisca che il licenziante ti avalli o avalli il tuo utilizzo.
+
+- **Non opere derivate** — Se remixi, trasformi o costruisci sul materiale, non puoi distribuire il materiale modificato.
+
+- **Nessuna restrizione aggiuntiva** — Non puoi applicare termini legali o misure tecnologiche che limitino legalmente altri dall'usare il materiale secondo i termini della licenza.
