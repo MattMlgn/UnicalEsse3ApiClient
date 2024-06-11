@@ -128,7 +128,7 @@ class UnicalApiClient:
 
 if __name__ == "__main__":
     
-    client = UnicalApiClient('bngnnp01t44h579x', 'NinaPia.2020') #Imposta credenziali
+    client = UnicalApiClient('', '') #Imposta credenziali
     client.authenticate() # Esegue l'autenticazione
     #client.anagrafica() # Stampa l'anagrafica
     #client.get_attivita_per_appelli()  ### LISTA DEGLI INSEGNAMENTI PER CUI GLI APPELLI SONO SBLOCCATI ###

@@ -4,8 +4,8 @@ from utils import anagrafica
 
 
 # Definisci le credenziali
-username = 'bngnnp01t44h579x'
-password = 'NinaPia.2020'
+username = ''
+password = ''
 
 # Definisci l'URL dell'endpoint
 url = "https://unical.esse3.cineca.it/e3rest/api"
