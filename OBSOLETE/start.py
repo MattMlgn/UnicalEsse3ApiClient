@@ -108,6 +108,6 @@ def get_appelli_prenotati(matId):
 if __name__ == "__main__":
     #anagrafica(authenticate())
     #get_attivita_per_appelli()
-    #appello(9142)
+    appello(9142)
     #get_appelli_prenotati(401817)
-    pass
+    #pass
