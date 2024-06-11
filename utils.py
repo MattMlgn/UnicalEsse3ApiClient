@@ -18,6 +18,7 @@ def parse_response(response):
                 'tipoCorsoCod': data.get('user', {}).get('trattiCarriera', [{}])[0].get('dettaglioTratto', {}).get('tipoCorsoCod', ''),
                 'ultimoAnnoFlg': data.get('user', {}).get('trattiCarriera', [{}])[0].get('dettaglioTratto', {}).get('ultimoAnnoFlg', ''),
                 'matricola': data.get('user', {}).get('trattiCarriera', [{}])[0].get('matricola', ''),
+                'matId': data.get('user', {}).get('trattiCarriera', [{}])[0].get('dettaglioTratto', {}).get('matId', ''),
                 'staMatDes': data.get('user', {}).get('trattiCarriera', [{}])[0].get('staMatDes', ''),
             },
             'auth_token': data.get('authToken', ''),
@@ -52,6 +53,7 @@ def print_user_info(user):
     print(f"Tipo di Corso: {user.get('tipoCorsoCod', '')}")
     print(f"Ultimo Anno: {ultimo_anno}")
     print(f"Matricola: {user.get('matricola', '')}")
+    print(f"Id Matricola: {user.get('matId', '')}")
     print(f"Stato della Matricola: {user.get('staMatDes', '')}")
 
 def anagrafica(response):
