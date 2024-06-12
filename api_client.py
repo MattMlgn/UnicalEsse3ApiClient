@@ -179,13 +179,16 @@ class UnicalApiClient:
             print(response.text)
 
 if __name__ == "__main__":
-    client = UnicalApiClient('bngnnp01t44h579x', 'NinaPia.2020')  # Imposta credenziali
-    client.authenticate()  # Esegue l'autenticazione e popola i dati
+    ### Questi devono essere sempre eseguiti ###
+    #client = UnicalApiClient('', '')  # Imposta credenziali
+    #client.authenticate()  # Esegue l'autenticazione e popola i dati
+    
     # Le seguenti chiamate stampano i dati già popolati
     #client.anagrafica()  # Stampa l'anagrafica
     #client.get_attivita_per_appelli()  # Stampa la lista degli insegnamenti per cui gli appelli sono sbloccati
     #print(client.insegnamenti)
     #client.appello(client.insegnamenti["LINGUA E TRADUZIONE INGLESE I - PRIMA LINGUA DI SPECIALIZZAZIONE"])  # Stampa la lista di appelli prenotabili e futuri dato l'insegnamento
     #client.get_appelli_prenotati()  # Stampa gli appelli prenotati
-    client.medieC() # Stampa le medie
+    #client.medieC() # Stampa le medie
+    pass
     
