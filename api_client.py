@@ -1,6 +1,12 @@
 import requests
 from requests.auth import HTTPBasicAuth
 
+def get_key_from_value(dizionario, valore):
+    for chiave, valore_corrente in dizionario.items():
+        if valore_corrente == valore:
+            return chiave
+    return None
+
 class UnicalApiClient:
     def __init__(self, username, password):
         self.username = username
@@ -15,9 +21,26 @@ class UnicalApiClient:
         if response.status_code == 200:
             self.auth_data = response.json()
             self.matId = self.auth_data.get('user', {}).get('trattiCarriera', [{}])[0].get('dettaglioTratto', {}).get('matId', '')
+            self.populate_insegnamenti()
             return self.auth_data
         else:
             response.raise_for_status()
+
+    def populate_insegnamenti(self):
+        url = f"{self.base_url}/calesa-service-v1/appelli"
+        params = {
+            'start': 0,
+            'limit': 50,
+            'order': '+dataInizio'
+        }
+        response = requests.get(url, auth=HTTPBasicAuth(self.username, self.password), params=params)
+        if response.status_code == 200:
+            appelli = response.json()
+            for appello in appelli:
+                self.insegnamenti[appello['adDes']] = appello['adDefAppId']
+        else:
+            print(f"Errore: {response.status_code}")
+            print(response.text)
 
     def anagrafica(self):
         data = self.auth_data.get('user', {})
@@ -60,49 +83,29 @@ class UnicalApiClient:
         print(f"Stato della Matricola: {user['staMatDes']}")
 
     def get_attivita_per_appelli(self):
-        url = f"{self.base_url}/calesa-service-v1/appelli"
+        for nome_appello, id_appello in self.insegnamenti.items():
+            print(f"Nome Appello: {nome_appello}")
+            print(f"Id Appello: {id_appello}")
+            print()  # Linea vuota per separare i record
+
+    def appello(self, adId):
+        cdsId = 10224  # ID del corso di studio
         params = {
+            'q': 'APPELLI_PRENOTABILI_E_FUTURI',
             'start': 0,
             'limit': 50,
             'order': '+dataInizio'
         }
-        response = requests.get(url, auth=HTTPBasicAuth(self.username, self.password), params=params)
-        if response.status_code == 200:
-            appelli = response.json()
-            for appello in appelli:
-                print(f"Anno: {appello['aaOffId']}")
-                print(f"Id Appello: {appello['adDefAppId']}")
-                print(f"Nome Appello: {appello['adDes']}")
-                print(f"Id Corso di Studio: {appello['cdsDefAppId']}")
-                print()  # Linea vuota per separare i record
-                self.insegnamenti[appello['adDes']] = appello['adDefAppId']
-  
-        else:
-            print(f"Errore: {response.status_code}")
-            print(response.text)
-        
-
-    def appello(self, adId):
-        cdsId = 10224  # ID del corso di studio
-        # Parametri opzionali
-        params = {
-            'q': 'APPELLI_PRENOTABILI_E_FUTURI',  # Filtra per appelli prenotabili
-            'start': 0,
-            'limit': 50,
-            'order': '+dataInizio',
-            #'aaCalId' : 2024
-        }
         url = f"{self.base_url}/calesa-service-v1/appelli/{cdsId}/{adId}/"
         response = requests.get(url, auth=HTTPBasicAuth(self.username, self.password), params=params)
-         # Verifica la risposta
         if response.status_code == 200:
             appelli = response.json()
             for appello in appelli:
                 print(f"Insegnamento: {appello['adDes']}")
                 print(f"Corso di Studio: {appello['cdsDes']}")
-                print(f"Data Fine Iscrizioni: {appello['dataFineIscr'].split()[0]}")
-                print(f"Data Appello: {appello['dataInizioApp'].split()[0]}")
                 print(f"Data Inizio Iscrizioni: {appello['dataInizioIscr'].split()[0]}")
+                print(f"Data Fine Iscrizioni: {appello['dataFineIscr'].split()[0]}")
+                print(f"Data Esame: {appello['dataInizioApp'].split()[0]}")
                 print(f"Descrizione: {appello['desApp']}")
                 print(f"Iscritti: {appello['numIscritti']}")
                 print(f"Presidente Commissione d'Esame: {appello['presidenteNome']} {appello['presidenteCognome']}")
@@ -119,6 +122,7 @@ class UnicalApiClient:
             appelli = response.json()
             for appello in appelli:
                 print(f"Id Appello: {appello['adId']}")
+                print(f"Nome Insegnamento: {get_key_from_value(self.insegnamenti, appello['adId'])}")
                 print(f"Data Prenotazione: {appello['dataIns']}")
                 print(f"Data Appello: {appello['dataEsa']}")
                 print()  # Linea vuota per separare i record
@@ -127,10 +131,11 @@ class UnicalApiClient:
             print(response.text)
 
 if __name__ == "__main__":
-    
-    client = UnicalApiClient('', '') #Imposta credenziali
-    client.authenticate() # Esegue l'autenticazione
-    #client.anagrafica() # Stampa l'anagrafica
-    #client.get_attivita_per_appelli()  ### LISTA DEGLI INSEGNAMENTI PER CUI GLI APPELLI SONO SBLOCCATI ###
-    #client.appello(client.insegnamenti["DIDATTICA DELLE LINGUE"]) ### LISTA DI APPELLI PRENOTABILI E FUTURI DATO INSEGNAMENTO###
-    #client.get_appelli_prenotati() ### APPELLI PRENOTATI ###
+    client = UnicalApiClient('bngnnp01t44h579x', 'NinaPia.2020')  # Imposta credenziali
+    #client.authenticate()  # Esegue l'autenticazione e popola i dati
+    # Le seguenti chiamate stampano i dati già popolati
+    #client.anagrafica()  # Stampa l'anagrafica
+    #client.get_attivita_per_appelli()  # Stampa la lista degli insegnamenti per cui gli appelli sono sbloccati
+    #print(client.insegnamenti)
+    #client.appello(client.insegnamenti["LINGUA E TRADUZIONE INGLESE I - PRIMA LINGUA DI SPECIALIZZAZIONE"])  # Stampa la lista di appelli prenotabili e futuri dato l'insegnamento
+    #client.get_appelli_prenotati()  # Stampa gli appelli prenotati
