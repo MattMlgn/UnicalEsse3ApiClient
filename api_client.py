@@ -14,6 +14,8 @@ class UnicalApiClient:
         self.base_url = "https://unical.esse3.cineca.it/e3rest/api"
         self.matId = 0
         self.insegnamenti = {}
+        self.cdsId = 0
+        self.medie = {}
 
     def authenticate(self):
         url = f"{self.base_url}/login"
@@ -21,12 +23,12 @@ class UnicalApiClient:
         if response.status_code == 200:
             self.auth_data = response.json()
             self.matId = self.auth_data.get('user', {}).get('trattiCarriera', [{}])[0].get('dettaglioTratto', {}).get('matId', '')
-            self.populate_insegnamenti()
+            self.populate()
             return self.auth_data
         else:
             response.raise_for_status()
 
-    def populate_insegnamenti(self):
+    def populate(self):
         url = f"{self.base_url}/calesa-service-v1/appelli"
         params = {
             'start': 0,
@@ -36,8 +38,25 @@ class UnicalApiClient:
         response = requests.get(url, auth=HTTPBasicAuth(self.username, self.password), params=params)
         if response.status_code == 200:
             appelli = response.json()
+            self.cdsId = appelli[0]['cdsDefAppId']
             for appello in appelli:
                 self.insegnamenti[appello['adDes']] = appello['adDefAppId']
+        else:
+            print(f"Errore: {response.status_code}")
+            print(response.text)
+
+        url = f"{self.base_url}/libretto-service-v2/libretti/{self.matId}/medie"
+        response = requests.get(url, auth=HTTPBasicAuth(self.username,self.password))
+        if response.status_code == 200:
+            risultati = response.json()
+            for risultato in risultati:
+                base = risultato.get('base', 'N/A')
+                media = risultato.get('media', 'N/A')
+                tipoMediaCod = risultato.get('tipoMediaCod', {}).get('value', 'N/A')
+                if base == 30 and tipoMediaCod == 'P':
+                    self.medie['voti'] = media
+                if base == 110 and tipoMediaCod == 'P':
+                    self.medie['baseL'] = media
         else:
             print(f"Errore: {response.status_code}")
             print(response.text)
@@ -89,14 +108,13 @@ class UnicalApiClient:
             print()  # Linea vuota per separare i record
 
     def appello(self, adId):
-        cdsId = 10224  # ID del corso di studio
         params = {
             'q': 'APPELLI_PRENOTABILI_E_FUTURI',
             'start': 0,
             'limit': 50,
             'order': '+dataInizio'
         }
-        url = f"{self.base_url}/calesa-service-v1/appelli/{cdsId}/{adId}/"
+        url = f"{self.base_url}/calesa-service-v1/appelli/{self.cdsId}/{adId}/"
         response = requests.get(url, auth=HTTPBasicAuth(self.username, self.password), params=params)
         if response.status_code == 200:
             appelli = response.json()
@@ -125,17 +143,46 @@ class UnicalApiClient:
                 print(f"Nome Insegnamento: {get_key_from_value(self.insegnamenti, appello['adId'])}")
                 print(f"Data Prenotazione: {appello['dataIns']}")
                 print(f"Data Appello: {appello['dataEsa']}")
+                print(f"Peso: {int(appello['pesoAd'])}")
                 print()  # Linea vuota per separare i record
+        else:
+            print(f"Errore: {response.status_code}")
+            print(response.text)
+
+    def medieC(self):
+        url = f"{self.base_url}/libretto-service-v2/libretti/{self.matId}/medie"
+        response = requests.get(url, auth=HTTPBasicAuth(self.username,self.password))
+        print(f"Media Ponderata Voti: {self.medie['voti']}\nMedia Base Laurea Ponderata: {self.medie['baseL']}")
+        if response.status_code == 200:
+            risultati = response.json()
+            for risultato in risultati:
+                base = risultato.get('base', 'N/A')
+                media = risultato.get('media', 'N/A')
+                tipoMediaCod = risultato.get('tipoMediaCod', {}).get('value', 'N/A')
+                
+                if base == 30 and tipoMediaCod == 'A':
+                    print(f"Media Aritmetica Voti: {media}")
+                if base == 110 and tipoMediaCod == 'A':
+                    print(f"Media Base Laurea Aritmetica: {media}")
+
+                ### FUNZIONE CALCOLO VARIAZIONE MEDIA  ###
+            """if(input("Vuoi simulare un nuovo voto? S/N: ")) == 'S':
+                nuovoV = int(input("\nInserisci il voto: "))
+                cfu = int(input("\nInserisci i crediti: "))
+                cfuT = int(input("\nI tuoi cfu totali attuali: "))
+                print("La nuova media voti sarà: ", round(((self.medie['voti']*cfuT)+(nuovoV+cfu))/(cfuT+cfu),2))"""
+            
         else:
             print(f"Errore: {response.status_code}")
             print(response.text)
 
 if __name__ == "__main__":
     client = UnicalApiClient('bngnnp01t44h579x', 'NinaPia.2020')  # Imposta credenziali
-    #client.authenticate()  # Esegue l'autenticazione e popola i dati
+    client.authenticate()  # Esegue l'autenticazione e popola i dati
     # Le seguenti chiamate stampano i dati già popolati
     #client.anagrafica()  # Stampa l'anagrafica
     #client.get_attivita_per_appelli()  # Stampa la lista degli insegnamenti per cui gli appelli sono sbloccati
     #print(client.insegnamenti)
     #client.appello(client.insegnamenti["LINGUA E TRADUZIONE INGLESE I - PRIMA LINGUA DI SPECIALIZZAZIONE"])  # Stampa la lista di appelli prenotabili e futuri dato l'insegnamento
     #client.get_appelli_prenotati()  # Stampa gli appelli prenotati
+    #client.medieC() # Stampa le medie
