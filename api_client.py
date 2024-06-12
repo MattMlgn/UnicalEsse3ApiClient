@@ -49,6 +49,7 @@ class UnicalApiClient:
         response = requests.get(url, auth=HTTPBasicAuth(self.username,self.password))
         if response.status_code == 200:
             risultati = response.json()
+            print(risultati)
             for risultato in risultati:
                 base = risultato.get('base', 'N/A')
                 media = risultato.get('media', 'N/A')
@@ -80,7 +81,8 @@ class UnicalApiClient:
             'matricola': data.get('trattiCarriera', [{}])[0].get('matricola', ''),
             'staMatDes': data.get('trattiCarriera', [{}])[0].get('staMatDes', ''),
         }
-        self.print_user_info(user_info)
+        #self.print_user_info(user_info)
+        return user_info
 
     def print_user_info(self, user):
         ultimo_anno = 'Si' if user.get('ultimoAnnoFlg', 0) == 1 else 'No'
@@ -103,7 +105,7 @@ class UnicalApiClient:
 
     def get_attivita_per_appelli(self):
         for nome_appello, id_appello in self.insegnamenti.items():
-            print(f"Nome Appello: {nome_appello}")
+            print(f"Nome Insegnamento: {nome_appello}")
             print(f"Id Appello: {id_appello}")
             print()  # Linea vuota per separare i record
 
@@ -143,7 +145,7 @@ class UnicalApiClient:
                 print(f"Nome Insegnamento: {get_key_from_value(self.insegnamenti, appello['adId'])}")
                 print(f"Data Prenotazione: {appello['dataIns']}")
                 print(f"Data Appello: {appello['dataEsa']}")
-                print(f"Peso: {int(appello['pesoAd'])}")
+                print(f"Peso: {int(appello['pesoAd'])} cfu")
                 print()  # Linea vuota per separare i record
         else:
             print(f"Errore: {response.status_code}")
@@ -185,4 +187,5 @@ if __name__ == "__main__":
     #print(client.insegnamenti)
     #client.appello(client.insegnamenti["LINGUA E TRADUZIONE INGLESE I - PRIMA LINGUA DI SPECIALIZZAZIONE"])  # Stampa la lista di appelli prenotabili e futuri dato l'insegnamento
     #client.get_appelli_prenotati()  # Stampa gli appelli prenotati
-    #client.medieC() # Stampa le medie
+    client.medieC() # Stampa le medie
+    
