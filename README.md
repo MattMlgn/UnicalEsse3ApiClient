@@ -5,9 +5,10 @@ Questo repository contiene un client API in Python per interagire con i servizi 
 ## Funzionalità
 
 - Login e autenticazione
-- Recupero degli appelli
-- Gestione delle prenotazioni
-- Gestione degli esiti
+- Recupero anagrafica e insegnamenti
+- Ricerca degli appelli disponibili
+- Recupero delle prenotazioni
+- Recupero Medie
 
 ## Prerequisiti
 
@@ -21,15 +22,7 @@ Questo repository contiene un client API in Python per interagire con i servizi 
 2. Installa le dipendenze:
 
 ## Utilizzo
-
-### Configurazione
-
-Definisci le tue credenziali e l'URL base:
-```python
-base_url = "https://unical.esse3.cineca.it/e3rest/api"
-username = 'your_username'
-password = 'your_password'
-```
+Esegui il file `play.py` per vedere le api all'opera
 
 # Licenza
 
